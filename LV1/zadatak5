@@ -1,0 +1,23 @@
+counterham=0
+counterhamWord=0
+counterspam=0
+counterspamWord=0
+counterspamExclaim = 0
+fhand=open("SMSSpamCollection.txt", encoding="utf8")
+
+for line in fhand:
+    line = line.strip()
+    if line.startswith("ham"):
+        counterham += 1
+        counterhamWord += len(line.split()) - 1 
+    elif line.startswith("spam"):
+        counterspam += 1
+        counterspamWord += len(line.split()) - 1  
+        if line.endswith("!"):
+            counterspamExclaim += 1
+
+fhand.close()
+
+print("Prosjek riječi u ham porukama:", counterhamWord / counterham)
+print("Prosjek riječi u spam porukama:", counterspamWord / counterspam)
+print("Broj spam poruka sa uskličnikom:", counterspamExclaim)

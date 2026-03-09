@@ -1,0 +1,11 @@
+
+RadniSati = int(input())
+EurPoSatu = float(input())
+
+def total_euro():
+    return RadniSati*EurPoSatu
+
+
+ukupno = total_euro()
+print(f"{ukupno}")
+
