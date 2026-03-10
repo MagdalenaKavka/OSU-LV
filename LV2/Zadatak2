@@ -1,0 +1,37 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+data = np.loadtxt('data.csv', delimiter=",", skiprows=1)
+
+print(f"Amount of people measured: {len(data)}")
+
+gender = data[:, 0]
+height = data[:, 1]
+weight = data[:, 2]
+
+
+plt.scatter(height, weight)
+plt.show()
+
+
+print(f"Max: {height.max()}, Min: {height.min()}, Mean: {height.mean()}")
+
+men_mask = gender == 1
+women_mask = gender == 0
+
+plt.scatter(height[men_mask], weight[men_mask], color='blue', label='Men')
+plt.scatter(height[women_mask], weight[women_mask], color='red', label='Women')
+plt.legend()
+plt.show()
+
+plt.scatter(height[::50], weight[::50])
+plt.show()
+
+
+men = height[gender == 1]
+women = height[gender == 0]
+
+
+
+print(f"MEN:\n Max: {men.max()}, Min: {men.min()}, Mean: {men.mean()}")
+print(f"WOMEN:\n Max: {women.max()}, Min: {women.min()}, Mean: {women.mean()}")

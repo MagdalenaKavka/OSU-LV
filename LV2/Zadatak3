@@ -1,0 +1,53 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+img = plt.imread("road.jpg")
+img = img[:,:,0].copy()
+
+print(img.shape)
+print(img.dtype)
+
+plt.figure()
+plt.imshow(img, cmap="gray")
+plt.title("Original")
+plt.axis("off")
+plt.show()
+
+#posvijeljeno
+bright = img.astype(np.float32) + 80
+bright = np.clip(bright, 0, 255).astype(np.uint8)
+
+plt.figure()
+plt.imshow(bright, cmap="gray")
+plt.title("a) Posvijetljeno")
+plt.axis("off")
+plt.show()
+
+#druga cetvrtina
+H, W = img.shape
+druga = img[:, W//4 : W//2]
+
+plt.imshow(druga, cmap="gray")
+plt.title("b) Druga četvrtina slike: ")
+plt.axis("off")
+plt.show()
+
+#rotirano
+rot = np.rot90(img, k=-1)
+plt.imshow(rot, cmap="gray")
+plt.title("c) Rotirano za 90 u smjeru kazaljke")
+plt.axis("off")
+plt.show()
+
+rot = np.rot90(img, k=1)
+plt.imshow(rot, cmap="gray")
+plt.title("c) Rotirano za 90 u suprotnom smjeru kazaljke")
+plt.axis("off")
+plt.show()
+
+#flipped
+mirror = np.fliplr(img)
+plt.imshow(mirror, cmap="gray")
+plt.title("d) Zrcaljena slika: ")
+plt.axis("off")
+plt.show()
