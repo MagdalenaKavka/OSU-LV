@@ -1,0 +1,92 @@
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.cluster.hierarchy import dendrogram
+from sklearn.datasets import make_blobs, make_circles, make_moons
+from sklearn.cluster import KMeans, AgglomerativeClustering
+
+
+def generate_data(n_samples, flagc):
+    # 3 grupe
+    if flagc == 1:
+        random_state = 365
+        X,y = make_blobs(n_samples=n_samples, random_state=random_state)
+    
+    # 3 grupe
+    elif flagc == 2:
+        random_state = 148
+        X,y = make_blobs(n_samples=n_samples, random_state=random_state)
+        transformation = [[0.60834549, -0.63667341], [-0.40887718, 0.85253229]]
+        X = np.dot(X, transformation)
+
+    # 4 grupe 
+    elif flagc == 3:
+        random_state = 148
+        X, y = make_blobs(n_samples=n_samples,
+                        centers = 4,
+                        cluster_std=np.array([1.0, 2.5, 0.5, 3.0]),
+                        random_state=random_state)
+    # 2 grupe
+    elif flagc == 4:
+        X, y = make_circles(n_samples=n_samples, factor=.5, noise=.05)
+    
+    # 2 grupe  
+    elif flagc == 5:
+        X, y = make_moons(n_samples=n_samples, noise=.05)
+    
+    else:
+        X = []
+        
+    return X
+
+fig, axes = plt.subplots(2,3, figsize=(10,8))
+axes = axes.flatten()
+for i in range(5):
+    X = generate_data(500, i+1)
+
+    axes[i].scatter(X[:, 0], X[:, 1])
+    axes[i].set_xlabel('$x_1$')
+    axes[i].set_ylabel('$x_2$')
+    axes[i].set_title(f'podatkovni primjeri za flag={i+1}')
+
+plt.tight_layout()
+plt.show()
+
+for k in range(2,6):
+    fig, axes = plt.subplots(2,3, figsize=(10,8))
+    axes = axes.flatten()
+    fig.suptitle(f'K-means, k={k}')
+    for i in range(5):
+        X = generate_data(500, i+1)
+        
+        km = KMeans(n_clusters=k, init='random', n_init=5, random_state=0)
+        km.fit(X)
+        labels = km.predict(X)
+
+        axes[i].scatter(X[:, 0], X[:, 1], c=labels, cmap='viridis')
+        axes[i].set_xlabel('$x_1$')
+        axes[i].set_ylabel('$x_2$')
+        axes[i].set_title(f'podatkovni primjeri za flag={i+1}')
+
+plt.tight_layout()
+plt.show()
+
+optimal_k = [3,3,4,2,2]
+
+fig, axes = plt.subplots(2,3, figsize=(10,8))
+axes = axes.flatten()
+
+for i in range(5):
+    X = generate_data(500, i+1)
+    k = optimal_k[i]
+
+    km = KMeans(n_clusters=k, init='random', n_init=5, random_state=0)
+    km.fit(X)
+    labels = km.predict(X)
+
+    axes[i].scatter(X[:, 0], X[:, 1], c=labels, cmap='viridis')
+    axes[i].set_xlabel('$x_1$')
+    axes[i].set_ylabel('$x_2$')
+    axes[i].set_title(f'podatkovni primjeri za flag={i+1}, k={k}')
+
+plt.tight_layout()
+plt.show()
