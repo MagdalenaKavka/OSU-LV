@@ -1,0 +1,41 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn import svm
+
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.pipeline import make_pipeline
+from sklearn.model_selection import GridSearchCV, cross_val_score
+
+data = pd.read_csv("LV6/Social_Network_Ads.csv")
+
+X = data[["Age","EstimatedSalary"]].to_numpy()
+y = data["Purchased"].to_numpy()
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, stratify=y, random_state = 10)
+cv_scores = []
+
+k_values = range(1,100)
+
+for k in k_values:
+    pipe = Pipeline(
+        [('scaler', StandardScaler()),
+         ('knn', KNeighborsClassifier(n_neighbors=k))
+         ])
+    scores = cross_val_score(pipe, X_train, y_train.ravel(), cv=5)
+    cv_scores.append(scores.mean())
+
+best_k = k_values[np.argmax(cv_scores)]
+print(f'Optimalni K: {best_k}')
+
+plt.plot(k_values, cv_scores)
+plt.xlabel('K')
+plt.ylabel('CV accuracy')
+plt.show()

@@ -1,0 +1,131 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+from sklearn import datasets
+from sklearn . model_selection import train_test_split
+from sklearn . preprocessing import MinMaxScaler
+from sklearn . preprocessing import OneHotEncoder
+import sklearn . linear_model as lm
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, mean_absolute_percentage_error, root_mean_squared_error
+
+data = pd.read_csv('LV4\data_C02_emission.csv')
+
+X = data[['Engine Size (L)','Cylinders', 'Fuel Consumption City (L/100km)','Fuel Consumption Hwy (L/100km)','Fuel Consumption Comb (L/100km)','Fuel Consumption Comb (mpg)']]
+y= data['CO2 Emissions (g/km)']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
+
+plt.figure()
+plt.scatter(X_train['Engine Size (L)'], y_train, color='blue')
+plt.scatter(X_test['Engine Size (L)'], y_test, color='red')
+plt.xlabel('Engine Size(L)')
+plt.ylabel('CO2 Emission')
+
+
+plt.figure()
+plt.scatter(X_train['Cylinders'], y_train, color='blue')
+plt.scatter(X_test['Cylinders'], y_test, color='red')
+plt.xlabel('Cylinders')
+plt.ylabel('CO2 Emission')
+
+
+plt.figure()
+plt.scatter(X_train['Fuel Consumption City (L/100km)'], y_train, color='blue')
+plt.scatter(X_test['Fuel Consumption City (L/100km)'], y_test, color='red')
+plt.xlabel('Fuel Consumption City (L/100km)')
+plt.ylabel('CO2 Emission')
+
+plt.figure()
+plt.scatter(X_train['Fuel Consumption Hwy (L/100km)'], y_train, color='blue')
+plt.scatter(X_test['Fuel Consumption Hwy (L/100km)'], y_test, color='red')
+plt.xlabel('Fuel Consumption Hwy (L/100km)')
+plt.ylabel('CO2 Emission')
+
+plt.figure()
+plt.scatter(X_train['Fuel Consumption Comb (L/100km)'], y_train, color='blue')
+plt.scatter(X_test['Fuel Consumption Comb (L/100km)'], y_test, color='red')
+plt.xlabel('Fuel Consumption Comb (L/100km)')
+plt.ylabel('CO2 Emission')
+
+plt.figure()
+plt.scatter(X_train['Fuel Consumption Comb (mpg)'], y_train, color='blue')
+plt.scatter(X_test['Fuel Consumption Comb (mpg)'], y_test, color='red')
+plt.xlabel('Fuel Consumption Comb (mpg)')
+plt.ylabel('CO2 Emission')
+
+plt.show()
+
+
+X = data[['Engine Size (L)', 'Cylinders','Fuel Consumption City (L/100km)']]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
+
+sc = MinMaxScaler()
+X_train_n = sc.fit_transform(X_train)
+X_test_n = sc.transform(X_test)
+
+plt.figure()
+plt.hist(X_train['Engine Size (L)'], color='blue')
+plt.hist(X_train_n[:, 0], color='red')
+plt.show()
+
+linearModel = lm.LinearRegression()
+linearModel.fit(X_train_n, y_train)
+print("Intercept:", linearModel.intercept_)
+print("Koeficijenti:", linearModel.coef_)
+
+y_test_p = linearModel.predict(X_test_n)
+plt.figure()
+plt.scatter(y_test, y_test_p)
+plt.xlabel('Stvarne vrijednosti (CO2)')
+plt.ylabel('Procjena modela')
+plt.show()
+
+print('MSE:', mean_squared_error(y_test, y_test_p)) 
+print('RMSE:', root_mean_squared_error(y_test, y_test_p)) 
+print('MAE:', mean_absolute_error(y_test, y_test_p)) 
+print('MAPE:', mean_absolute_percentage_error(y_test, y_test_p)) 
+print('R²:', r2_score(y_test, y_test_p)) 
+
+# jedan feature
+# MSE: 1365.4750095569002
+# RMSE: 36.95233429104175
+# MAE: 27.774231317822505
+# MAPE: 0.11767872944245204
+# R²: 0.6624051906186812
+
+# dva feautera
+# MSE: 1192.1527053627392
+# RMSE: 34.52756442847858
+# MAE: 25.646022687420796
+# MAPE: 0.11037492322133886
+# R²: 0.7052567330024164
+
+# tri featurea
+# MSE: 345.29440429393054
+# RMSE: 18.582099028202666
+# MAE: 11.415539631968704
+# MAPE: 0.043965626527762806
+# R²: 0.9146307345193578
+
+# cetiri feautera
+# MSE: 304.6877269323209
+# RMSE: 17.45530655509438
+# MAE: 8.740163421877073
+# MAPE: 0.0347852167167945
+# R²: 0.9246701738408799
+
+# pet featurea
+# MSE: 305.6013306729388
+# RMSE: 17.481456766326392
+# MAE: 8.735831486529523
+# MAPE: 0.034783782828118066
+# R²: 0.9244442979526319
+
+# svi featuri: Intercept: 182.235533540452
+# Koeficijenti: [   5.97412084   69.73026306  -60.46190471   -3.70951856  354.14025973 -121.49620549]
+# MSE: 257.2002271349325
+# RMSE: 16.03746323877104
+# MAE: 8.18449505021558
+# MAPE: 0.02989202948172508
+# R²: 0.9364108013367262

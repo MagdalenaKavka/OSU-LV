@@ -1,0 +1,94 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn import svm
+
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.pipeline import make_pipeline
+from sklearn.model_selection import GridSearchCV
+
+def plot_decision_regions(X, y, classifier, resolution=0.02, ax=None):
+    if ax is None:
+        fig, ax = plt.subplots()
+    
+    labels = {0: 'Klasa 0', 1: 'Klasa 1'}
+    markers = ('s', 'x', 'o', '^', 'v')
+    colors = ('red', 'blue', 'lightgreen', 'gray', 'cyan')
+    cmap = ListedColormap(colors[:len(np.unique(y))])
+    
+    x1_min, x1_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+    x2_min, x2_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+    xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, resolution),
+                            np.arange(x2_min, x2_max, resolution))
+    Z = classifier.predict(np.array([xx1.ravel(), xx2.ravel()]).T)
+    Z = Z.reshape(xx1.shape)
+    ax.contourf(xx1, xx2, Z, alpha=0.3, cmap=cmap)
+    ax.set_xlim(xx1.min(), xx1.max())
+    ax.set_ylim(xx2.min(), xx2.max())
+    
+    for idx, cl in enumerate(np.unique(y)):
+        ax.scatter(x=X[y == cl, 0],
+                   y=X[y == cl, 1],
+                   alpha=0.8,
+                   c=colors[idx],
+                   marker=markers[idx],
+                   label=labels[cl])
+
+
+# ucitaj podatke
+data = pd.read_csv("LV6/Social_Network_Ads.csv")
+
+# dataframe u numpy
+X = data[["Age","EstimatedSalary"]].to_numpy()
+y = data["Purchased"].to_numpy()
+
+# podijeli podatke u omjeru 80-20%
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, stratify=y, random_state = 10)
+
+# skaliraj ulazne velicine
+sc = StandardScaler()
+X_train_n = sc.fit_transform(X_train)
+X_test_n = sc.transform((X_test))
+
+model__C = [0.1, 1, 10]
+model__gamma = [0.01, 0.1, 1, 10]
+model__kernel= ['linear', 'poly', 'rbf', 'sigmoid'] # bez precomputed jer trazi square matrix a ova je 320x2
+
+fig, axes = plt.subplots(len(model__C), len(model__gamma), figsize=(15, 12))
+
+# SVM model sa RBF funkcijom, plot graf sa granicom odluke mijenjaj C i gamma i prikazi granice opet i pogresku na skupu TEST podataka, 
+       
+for i in range(len(model__C)):
+    for j in range(len(model__gamma)):
+        SVM_model = svm.SVC(kernel='rbf', gamma=model__gamma[j], C=model__C[i])
+        SVM_model.fit(X_train_n, y_train)
+        
+        y_test_p = SVM_model.predict(X_test_n)
+        
+        plot_decision_regions(X_train_n, y_train, classifier=SVM_model, ax=axes[i][j])
+        axes[i][j].set_title(f'C={model__C[i]}, gamma={model__gamma[j]}\nAcc={accuracy_score(y_test, y_test_p):.2f}')
+
+plt.tight_layout()
+plt.show()
+
+# mijenjaj tip kernela
+for k in range(len(model__kernel)):
+    fig, axes = plt.subplots(len(model__C), len(model__gamma), figsize=(15, 12))
+    for i in range(len(model__C)):
+        for j in range(len(model__gamma)):
+            SVM_model = svm.SVC(kernel=model__kernel[k], gamma=model__gamma[j], C=model__C[i])
+            SVM_model.fit(X_train_n, y_train)
+            
+            y_test_p = SVM_model.predict(X_test_n)
+            
+            plot_decision_regions(X_train_n, y_train, classifier=SVM_model, ax=axes[i][j])
+            axes[i][j].set_title(f'kernel={model__kernel[k]}, C={model__C[i]}, gamma={model__gamma[j]}\nAcc={accuracy_score(y_test, y_test_p):.2f}')
+    plt.tight_layout()
+    plt.show()
