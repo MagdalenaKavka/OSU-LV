@@ -1,0 +1,83 @@
+import pandas as pd
+
+data = pd.read_csv("LV3/data_C02_emission.csv")
+
+#a
+print(data.info()) #broj mjerenja, tip veličina
+
+print(data.isnull().sum()) #koliko nedostajucih vrijednosti
+data = data.dropna() #brise ih
+
+print(data.duplicated().sum()) #ima li dupliciranih redaka
+data = data.drop_duplicates() #brise ih
+
+data = data.reset_index(drop = True)
+
+data["Make"] = data["Make"].astype("category")
+data["Model"] = data["Model"].astype("category")
+data["Vehicle Class"] = data["Vehicle Class"].astype("category")
+data["Transmission"] = data["Transmission"].astype("category")
+data["Fuel Type"] = data["Fuel Type"].astype("category")
+
+print(data.info())
+
+#b
+
+largest = data.sort_values(
+    by = "Fuel Consumption City (L/100km)",
+    ascending = False 
+).head(3)
+
+smallest = data.sort_values(
+    by = "Fuel Consumption City (L/100km)",
+    ascending = False 
+).tail(3)
+
+print(largest[["Make", "Model", "Fuel Consumption City (L/100km)"]])
+
+print(smallest[["Make", "Model", "Fuel Consumption City (L/100km)"]])
+
+#c
+
+motor = data[(data["Engine Size (L)"] >= 2.5) & (data["Engine Size (L)"] <= 3.5)]
+print(len(motor))
+print("Prosjecna CO2 emisija: ", round(motor["CO2 Emissions (g/km)"].mean(), 2))
+
+#d
+
+audi = data[data["Make"] == "Audi"]
+print(len(audi))
+audi4 = audi[audi["Cylinders"] == 4]
+print("Prosjecna CO2 emisija za audi4: ", round(audi4["CO2 Emissions (g/km)"].mean(), 2))
+
+#e
+
+print(data.groupby("Cylinders").size())
+print(round(data.groupby("Cylinders")["CO2 Emissions (g/km)"].mean(), 2))
+
+#f
+
+print(round(data[data["Fuel Type"] == "D"]["Fuel Consumption City (L/100km)"].mean(), 2))
+print(round(data[data["Fuel Type"] == "D"]["Fuel Consumption City (L/100km)"].median(), 2))
+
+print(round(data[data["Fuel Type"] == "X"]["Fuel Consumption City (L/100km)"].mean(), 2))
+print(round(data[data["Fuel Type"] == "X"]["Fuel Consumption City (L/100km)"].median(), 2))
+
+#g
+
+dizel4 = data[(data["Fuel Type"] == "D") & (data["Cylinders"] == 4)]
+max_car = dizel4.sort_values(
+    by="Fuel Consumption City (L/100km)",
+    ascending=False
+).head(1)
+print(max_car[["Make","Model","Fuel Consumption City (L/100km)"]])
+
+#h
+
+manual = data[data["Transmission"].str.startswith("M")]
+print(len(manual))
+
+#i
+
+corr = data.corr(numeric_only= True)
+print(corr)

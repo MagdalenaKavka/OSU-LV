@@ -1,0 +1,41 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+data = pd.read_csv("LV3/data_C02_emission.csv")
+
+#--a--
+
+data["CO2 Emissions (g/km)"].plot(kind="hist")
+plt.xlabel("CO2 Emissions")
+plt.show()
+
+#--b--
+colors = {"X" : "blue", "Z" : "red", "D" : "green", "E" : "yellow", "N" : "black"}
+data.plot.scatter(
+    x = "Fuel Consumption City (L/100km)", 
+    y = "CO2 Emissions (g/km)",
+    c = data["Fuel Type"].map(colors)
+)
+plt.show()
+
+#--c--
+
+plt.figure()
+data.boxplot(
+    column = "Fuel Consumption Hwy (L/100km)",
+    by = "Fuel Type"
+)
+plt.show()
+
+#--d--
+
+plt.figure()
+data.groupby("Fuel Type").size().plot(kind="bar")
+plt.show()
+
+#--e--
+
+plt.figure()
+data.groupby("Cylinders")["CO2 Emissions (g/km)"].mean().plot(kind="bar")
+plt.ylabel("CO2 emissions")
+plt.show()
